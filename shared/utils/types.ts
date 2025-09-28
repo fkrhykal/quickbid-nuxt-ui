@@ -32,4 +32,5 @@ export type Category = {
 export type Account = {
   id: string
   username: string
+  avatar: string | null
 }

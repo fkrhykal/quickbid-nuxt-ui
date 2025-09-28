@@ -15,15 +15,22 @@ type FetchResponse = {
 }
 
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig(event)
   const body = await readValidatedBody(event, schema.parse)
   const res = await $fetch<FetchResponse, string>(
-    `${process.env.API_URL}/credentials`,
+    `${config.apiUrl}/credentials`,
     {
       body,
       method: 'post',
     }
   )
-  setCookie(event, 'accessToken', res.data.accessToken, { sameSite: true })
-  setCookie(event, 'refreshToken', res.data.refreshToken, { sameSite: true })
-  return { code: 200, message: 'login success' }
+  setCookie(event, 'accessToken', res.data.accessToken, {
+    sameSite: true,
+    maxAge: 10_000_000,
+  })
+  setCookie(event, 'refreshToken', res.data.refreshToken, {
+    sameSite: true,
+    maxAge: 10_000_000,
+  })
+  return setResponseStatus(event, 200)
 })

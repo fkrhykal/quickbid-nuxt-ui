@@ -17,8 +17,8 @@ const isActive = computed(() => model.value.length > 0 || isFocus.value)
 <template>
   <div class="relative">
     <label
-      :class="{ '-translate-y-[100%]': isActive }"
-      class="pointer-events-none absolute top-[25%] left-2 bg-white p-0.5 text-slate-900 transition-all"
+      :class="{ '-translate-y-[101%] px-2 text-sm tracking-wide': isActive }"
+      class="pointer-events-none absolute top-[25%] left-2 rounded-full bg-white p-0.5 text-slate-900 transition-all"
       :for="id"
       >{{ label }}</label
     >

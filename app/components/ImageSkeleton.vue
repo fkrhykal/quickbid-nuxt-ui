@@ -1,5 +1,10 @@
 <script setup lang="ts">
-const props = defineProps<{ src: string; imgAttrs?: Record<string, any> }>()
+import type { ImgHTMLAttributes } from 'vue'
+
+defineProps<{
+  src: string
+  imgAttrs?: ImgHTMLAttributes
+}>()
 
 const nonce = useNonce()
 const isLoaded = ref(false)
@@ -28,16 +33,15 @@ const onError = () => {
 <template>
   <div class="relative">
     <div
-      class="loading absolute top-0 right-0 bottom-0 left-0 grid place-items-center rounded-md bg-slate-200"
+      class="loading absolute top-0 right-0 bottom-0 left-0 grid w-full place-items-center rounded-md bg-slate-200"
       v-if="isLoading"
     ></div>
-    <NuxtPicture
+    <img
       @load="onLoad"
       @error="onError"
       :nonce="nonce"
-      :img-attrs="imgAttrs"
+      :style="imgAttrs?.style"
       :class="{ 'opacity-0': isLoading || isError }"
-      format="webp"
       :src="src"
     />
     <div
@@ -53,9 +57,9 @@ const onError = () => {
 .loading {
   background: linear-gradient(-90deg, #dad8d8 0%, #fcfcfc 50%, #dad8d8 100%);
   background-size: 400% 400%;
-  animation: background-pulse 1.2s ease-in-out infinite;
+  animation: bg-pulse 1.2s ease-in-out infinite;
 }
-@keyframes background-pulse {
+@keyframes bg-pulse {
   0% {
     background-position: 0% 0%;
   }

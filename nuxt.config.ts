@@ -7,9 +7,6 @@ export default defineNuxtConfig({
   css: ['~/assets/css/app.css'],
   modules: ['@nuxt/icon', 'nuxt-security', '@nuxt/image', '@nuxt/fonts'],
   vite: {
-    server: {
-      https: false as any,
-    },
     plugins: [tailwindcss()],
   },
   icon: {
@@ -31,5 +28,8 @@ export default defineNuxtConfig({
         'upgrade-insecure-requests': process.env.NODE_ENV === 'production',
       },
     },
+  },
+  runtimeConfig: {
+    apiUrl: process.env.NUXT_API_URL,
   },
 })

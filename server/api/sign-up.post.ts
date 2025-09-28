@@ -1,3 +1,5 @@
+import { FetchError } from 'ofetch'
+
 import z from 'zod'
 
 const schema = z.object({
@@ -5,11 +7,37 @@ const schema = z.object({
   password: z.string(),
 })
 
+function errorHandler(res: any) {}
+
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig(event)
   const body = await readValidatedBody(event, schema.parse)
-  await $fetch(`${process.env.API_URL}/accounts`, {
+  await $fetch(`${config.apiUrl}/accounts`, {
     body,
     method: 'post',
+  }).catch((error) => {
+    if (error instanceof FetchError) {
+      switch (error.statusCode) {
+        case 400: {
+          throw createError({
+            status: 400,
+            statusCode: 400,
+            data: error.data?.error,
+          })
+        }
+        case 409: {
+          throw createError({
+            status: 409,
+            statusCode: 409,
+          })
+        }
+        default: {
+          throw createError({
+            statusCode: 500,
+          })
+        }
+      }
+    }
   })
-  return { code: 200, message: 'sign up success' }
+  return setResponseStatus(event, 200)
 })

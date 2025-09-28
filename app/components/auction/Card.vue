@@ -1,5 +1,3 @@
-
-
 <script setup lang="ts">
 const props = defineProps<{ auction: Auction }>()
 
@@ -24,7 +22,7 @@ const formatedHighestBid = computed(() => {
         :img-attrs="{
           style: 'width:100%;height:100%;border-radius:6px;outline: none;',
         }"
-        class="aspect-[8/12]"
+        class="aspect-[8/12] w-full"
         :src="auction.product.image"
       />
       <ClientOnly>

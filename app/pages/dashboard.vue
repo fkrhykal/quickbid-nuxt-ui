@@ -1,11 +1,14 @@
 <script setup lang="ts">
-const { data: auctions } = await useAsyncData(getAuctions)
+definePageMeta({
+  middleware: ['auth'],
+})
 
 const isActive = ref(false)
 
-const hide = () => (isActive.value = false)
+const hide = () => {
+  isActive.value = false
+}
 </script>
-
 <template>
   <header
     class="sticky top-0 z-10 grid h-[4rem] place-items-center border-b border-b-slate-200 bg-white"
@@ -19,14 +22,5 @@ const hide = () => (isActive.value = false)
       <Profile v-if="!isActive" class="h-[70%]" />
     </nav>
   </header>
-  <main class="container mx-auto mt-2 space-y-4 px-1">
-    <div class="flex flex-wrap justify-baseline gap-4">
-      <AuctionCard
-        class="w-full md:max-w-[calc(100%/3-0.75rem)] lg:max-w-[calc(100%/4-0.75rem)]"
-        v-if="auctions"
-        v-for="auction in auctions"
-        :auction
-      />
-    </div>
-  </main>
+  <main></main>
 </template>
