@@ -1,3 +1,8 @@
+type Result = {
+  409: { code: 409; error: string }
+  500: { code: 409; error: string }
+}
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event)
   const accessToken = getCookie(event, 'accessToken')
@@ -6,7 +11,7 @@ export default defineEventHandler(async (event) => {
       statusCode: 400,
     })
   }
-  const response = await $fetch<{ code: 200; data: { account: Account } }>(
+  const res = await $fetch<{ code: 200; data: { account: Account } }>(
     `${config.apiUrl}/accounts/_current`,
     {
       method: 'get',
@@ -14,8 +19,24 @@ export default defineEventHandler(async (event) => {
         Authorization: `Bearer ${accessToken}`,
       },
     }
-  ).catch((res) => {
-    console.log({ res })
-  })
-  return response
+  ).catch(
+    handleServerFetchError({
+      409() {
+        throw createError({
+          statusCode: 409,
+        })
+      },
+      500() {
+        throw createError({
+          statusCode: 500,
+        })
+      },
+    })
+  )
+  if (res === undefined) {
+    throw createError({
+      statusCode: 500,
+    })
+  }
+  return res.data.account
 })

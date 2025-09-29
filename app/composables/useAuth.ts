@@ -1,48 +1,56 @@
-import type { FetchContext, FetchResponse, ResponseType } from 'ofetch'
-
 export function useAuth() {
-  const router = useRouter()
   const account = useState<Account | undefined>('auth:account')
+  const isFetched = useState('auth:fetch-status', () => false)
 
   const fetch = async () => {
-    const res = await useRequestFetch()('/api/accounts/_current').catch(
-      () => undefined
-    )
-    account.value = res?.data.account
+    if (account.value === undefined && isFetched.value === false) {
+      try {
+        const res = await useRequestFetch()('/api/accounts/_current')
+        account.value = res
+      } catch (error) {
+        account.value = undefined
+      } finally {
+        isFetched.value = true
+      }
+    }
   }
 
   const isAuthenticated = computed(() => Boolean(account.value))
 
   const signIn = async (options: {
     body: { username: string; password: string }
-    onResponseError?: <T>(
-      res: FetchContext<T, ResponseType> & {
-        response: FetchResponse<T>
-      }
-    ) => void | Promise<void>
+    onError?: (error: any) => Promise<void> | void
+    onSuccess?: (res: any) => Promise<void> | void
   }) => {
-    const csrf = useCsrf()
-    await useRequestFetch()('/api/sign-in', {
-      body: options.body,
-      onResponseError: options.onResponseError,
-      method: 'post',
-      headers: {
-        [csrf.headerName]: csrf.csrf,
-      },
-    })
-    await fetch()
+    try {
+      const csrf = useCsrf()
+      const res = await useRequestFetch()('/api/sign-in', {
+        body: options.body,
+        method: 'post',
+        headers: {
+          [csrf.headerName]: csrf.csrf,
+        },
+      })
+      await options.onSuccess?.(res)
+      await fetch()
+    } catch (error) {
+      await options.onError?.(error)
+    }
   }
 
-  const signOut = async (action?: () => Promise<void> | void) => {
-    const csrf = useCsrf()
-    await useRequestFetch()('/api/sign-out', {
-      method: 'post',
-      headers: {
-        [csrf.headerName]: csrf.csrf,
-      },
-    })
-    account.value = undefined
-    return await action?.()
+  const signOut = async (onSuccess?: () => Promise<void> | void) => {
+    try {
+      const csrf = useCsrf()
+      await useRequestFetch()('/api/sign-out', {
+        method: 'post',
+        headers: {
+          [csrf.headerName]: csrf.csrf,
+        },
+      })
+      account.value = undefined
+      isFetched.value = false
+      await onSuccess?.()
+    } catch (error) {}
   }
 
   return {

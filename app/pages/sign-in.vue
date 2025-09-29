@@ -15,11 +15,13 @@ const body = reactive({
 const submit = async () => {
   await signIn({
     body,
-    onResponseError() {
+    onError() {
       error.value = true
     },
+    onSuccess() {
+      router.push('/')
+    },
   })
-  await router.push('/')
 }
 </script>
 

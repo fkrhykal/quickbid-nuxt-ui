@@ -1,29 +1,23 @@
 export async function getCategories(): Promise<Category[]> {
   const csrf = useCsrf()
-  const response = await $fetch<{
-    code: 200
-    data: { categories: Category[] }
-  }>('/api/categories', {
+  const response = await $fetch<Category[]>('/api/categories', {
     method: 'get',
     headers: {
       [csrf.headerName]: csrf.csrf,
     },
   })
-  return response.data.categories
+  return response
 }
 
 export async function getAuctions(): Promise<Auction[]> {
   const csrf = useCsrf()
-  const response = await $fetch<{ code: 200; data: { auctions: Auction[] } }>(
-    '/api/auctions',
-    {
-      method: 'get',
-      headers: {
-        [csrf.headerName]: csrf.csrf,
-      },
-    }
-  )
-  return response.data.auctions
+  const response = await $fetch<Auction[]>('/api/auctions', {
+    method: 'get',
+    headers: {
+      [csrf.headerName]: csrf.csrf,
+    },
+  })
+  return response
 }
 
 export async function getCurrentAccount(): Promise<Account> {
@@ -34,5 +28,5 @@ export async function getCurrentAccount(): Promise<Account> {
       [csrf.headerName]: csrf.csrf,
     },
   })
-  return response.data.account
+  return response
 }

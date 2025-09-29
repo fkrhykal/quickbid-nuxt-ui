@@ -1,3 +1,5 @@
+export type MaybePromise<T> = Promise<T> | T
+
 export type Product = {
   name: string
   price: number

@@ -1,13 +1,15 @@
-import { FetchError } from 'ofetch'
-
-import z from 'zod'
+import z, { type infer as Infer } from 'zod'
 
 const schema = z.object({
   username: z.string(),
   password: z.string(),
 })
 
-function errorHandler(res: any) {}
+type Failure = {
+  400: { code: 400; error: Partial<Infer<typeof schema>> }
+  409: { code: 409; error: string }
+  500: { code: 500; error: string }
+}
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event)
@@ -15,29 +17,25 @@ export default defineEventHandler(async (event) => {
   await $fetch(`${config.apiUrl}/accounts`, {
     body,
     method: 'post',
-  }).catch((error) => {
-    if (error instanceof FetchError) {
-      switch (error.statusCode) {
-        case 400: {
-          throw createError({
-            status: 400,
-            statusCode: 400,
-            data: error.data?.error,
-          })
-        }
-        case 409: {
-          throw createError({
-            status: 409,
-            statusCode: 409,
-          })
-        }
-        default: {
-          throw createError({
-            statusCode: 500,
-          })
-        }
-      }
-    }
-  })
+  }).catch(
+    handleServerFetchError<Failure>({
+      400(res) {
+        throw createError({
+          statusCode: 400,
+          data: res.error,
+        })
+      },
+      409() {
+        throw createError({
+          statusCode: 409,
+        })
+      },
+      500() {
+        throw createError({
+          statusCode: 500,
+        })
+      },
+    })
+  )
   return setResponseStatus(event, 200)
 })

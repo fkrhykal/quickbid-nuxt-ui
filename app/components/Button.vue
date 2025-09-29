@@ -16,7 +16,7 @@ withDefaults(defineProps<{ variant?: Variant }>(), {
 
 <template>
   <button
-    class="grid w-full place-items-center rounded-md py-2 font-semibold transition-all"
+    class="flex w-full items-center justify-center rounded-md p-2 font-semibold transition-all"
     :class="{
       'bg-slate-950 text-white hover:bg-slate-800 disabled:bg-slate-700':
         variant === v.PRIMARY,

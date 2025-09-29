@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker'
 
 export default defineEventHandler(async (event) => {
+  const picture = faker.image.url()
   const getClosedAt = () => {
     const date = faker.date.future({ years: 1 })
     return Date.UTC(
@@ -29,17 +30,12 @@ export default defineEventHandler(async (event) => {
         username: faker.internet.username(),
       },
       product: {
-        image: faker.image.urlPicsumPhotos(),
+        image: picture,
         description: faker.word.words(),
         name: faker.commerce.product(),
         price: faker.number.int({ min: 10_000, max: 100_000 }),
       },
       closedAt: getClosedAt(),
     }))
-  return {
-    code: 200,
-    data: {
-      auctions,
-    },
-  }
+  return auctions
 })

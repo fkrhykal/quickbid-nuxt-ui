@@ -6,5 +6,5 @@ export default defineEventHandler(async (event) => {
   }>(`${config.apiUrl}/categories`, {
     method: 'get',
   })
-  return response
+  return response.data.categories
 })
